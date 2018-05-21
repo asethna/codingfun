@@ -14,16 +14,18 @@ def read_input_file(input_file, data_list):
         f = open(input_file, 'r')
         line = f.readline()
         while line:
-            #Date found in the current line
-            date = re.match(r"^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ", line).group(0)
-            #Check if 'Old=' value is found in the current line of the streaming rate file
-            if "Old" in line:
-                old = re.search(r"Old=\d*.\d*", line).group(0).replace("Old=","")
-                data_list.append("%s;%s"%(old,date))
-            #Check if 'New=' value is found in the current line of the streaming rate file
-            if "New" in line:
-                new = re.search(r"New=\d*.\d*", line).group(0).replace("New=","")
-                data_list.append("%s;%s"%(new,date))
+            #Date found in the start of the line or not
+            try:
+                date = re.match(r"^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ", line).group(0)
+                #Check if 'Old=' value is found in the current line of the streaming rate file
+                if "Old" in line:
+                    old = re.search(r"Old=\d*.\d*", line).group(0).replace("Old=","")
+                    data_list.append("%s;%s"%(old,date))
+                #Check if 'New=' value is found in the current line of the streaming rate file
+                if "New" in line:
+                    new = re.search(r"New=\d*.\d*", line).group(0).replace("New=","")
+                    data_list.append("%s;%s"%(new,date))
+            except: pass
             line = f.readline()
     finally:
         f.close()
@@ -97,18 +99,27 @@ def main():
     #create a data_list from the file provide: '<value><date>'
     data_list = []
     read_input_file(input_file, data_list)
-    data_list = merge_sort(data_list)
 
-    #calculates the statistics
-    size = len(data_list)
-    average = 0
-    for index in range(size):
-        average+=Decimal(data_list[index].split(';')[0])
-    average = round(average/size,3)
-    minimum = data_list[0].split(';')
-    maximum = data_list[-1].split(';')
-    middle = data_list[size/2].split(';')
-    print "Average is %s" % average
+    #checks to see if the data_list created from parsing the file is empty.
+    if (len(data_list) == 0):
+        #mark everything N\A if empty
+        average = "N\A"
+        minimum = ["N\A", "N\A"]
+        maximum = ["N\A", "N\A"]
+        middle = ["N\A", "N\A"]
+    else:
+        #sort the list
+        data_list = merge_sort(data_list)
+        #calculates the statistics
+        size = len(data_list)
+        average = 0
+        for index in range(size):
+            average+=Decimal(data_list[index].split(';')[0])
+        average = round(average/size,3)
+        minimum = data_list[0].split(';')
+        maximum = data_list[-1].split(';')
+        middle = data_list[size/2].split(';')
+    print "Average is %s" % str(average)
     print "Minimum is %s at time %s" % (minimum[0], minimum[1])
     print "Maximum is %s at time %s" % (maximum[0], maximum[1])
     print "Middle is %s at time %s" % (middle[0], middle[1])
