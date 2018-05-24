@@ -20,9 +20,13 @@ def compare(user_input):
                     Scissors wins by cutting Paper
                     Both are same it is a draw
                 the winner will be determined.
-    '''
+    '''    
     game_input = ['r','p','s']
+    if not(user_input in game_input):
+        return "Invalid user input: %s" % user_input
+
     computer_input = game_input[generate_random()]
+
     print "Computer Picked: %s" % computer_input
     if user_input == computer_input:
         return "Draw!"
@@ -42,9 +46,7 @@ def compare(user_input):
                 return "Rock blunts scissors\nComputer Wins!"
             else:
                 return "Scissors cut paper\nUser Wins!"
-        else:
-            return "Invalid user input: %s" % user_input
-
+            
 def main():
     print "###########################################"
     print "########## ROCK, PAPER, SCISSORS ##########"
