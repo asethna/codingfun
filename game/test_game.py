@@ -1,6 +1,7 @@
 import game
 import time
 from multiprocessing import Process
+import pytest
 
 def test_generate_random():
     '''
@@ -55,119 +56,76 @@ def test_invalid_strings():
     for item in invalid:
         assert "Invalid user input: %s" % item in game.compare(item)
 
-def test_draw_rock(monkeypatch):
+@pytest.fixture(scope="function", params=[(0,"r"), (1,"p"), (2,"s")])
+def draw_cases(request):
     '''
-    Summary:    Using monkeypatching for game.generate_random function.
-                Confirms the user_input matches computer and output is a draw
-                when rock is picked.
+    Summary:    Uses pytest fixtures to define the test cases
     Input:      None
-    Output:     None
+    Output:     Tuplues with input and expected result for each parameter
     '''
-    def _mocked():
-        return 0
-    monkeypatch.setattr("game.generate_random", _mocked)
-    assert "Draw!" in game.compare('r')
-    
-def test_draw_paper(monkeypatch):
-    '''
-    Summary:    Using monkeypatching for game.generate_random function.
-                Confirms the user_input matches computer and output is a draw
-                when paper is picked.
-    Input:      None
-    Output:     None
-    '''
-    def _mocked():
-        return 1
-    monkeypatch.setattr("game.generate_random", _mocked)
-    assert "Draw!" in game.compare('p')
-    
-def test_draw_scissors(monkeypatch):
-    '''
-    Summary:    Using monkeypatching for game.generate_random function.
-                Confirms the user_input matches computer and output is a draw
-                when scissors is picked.
-    Input:      None
-    Output:     None
-    '''
-    def _mocked():
-        return 2
-    monkeypatch.setattr("game.generate_random", _mocked)
-    assert "Draw!" in game.compare('s')
+    return request.param
 
-def test_lose_rock(monkeypatch):
+def test_draw(monkeypatch, draw_cases):
     '''
-    Summary:    Using monkeypatching for game.generate_random function.
-                Confirms the user_input loses against computer when
-                rock is picked.
+    Summary:    Using pytest fixtures to test when result is draw.
+                Implemented monkeypatching game.generate_random function.
+                Confirms the user_input compared with computer
+                output results in "Draw!"
     Input:      None
     Output:     None
     '''
+    (input, result) = draw_cases
     def _mocked():
-        return 0
+        return input
     monkeypatch.setattr("game.generate_random", _mocked)
-    assert "Computer Wins!" in game.compare('s')
-    
-def test_lose_paper(monkeypatch):
-    '''
-    Summary:    Using monkeypatching for game.generate_random function.
-                Confirms the user_input loses against computer when
-                paper is picked.
-    Input:      None
-    Output:     None
-    '''
-    def _mocked():
-        return 1
-    monkeypatch.setattr("game.generate_random", _mocked)
-    assert "Computer Wins!" in game.compare('r')
-    
-def test_lose_scissors(monkeypatch):
-    '''
-    Summary:    Using monkeypatching for game.generate_random function.
-                Confirms the user_input loses against computer when
-                scissors is picked.
-    Input:      None
-    Output:     None
-    '''
-    def _mocked():
-        return 2
-    monkeypatch.setattr("game.generate_random", _mocked)
-    assert "Computer Wins!" in game.compare('p')
+    assert "Draw!" in game.compare(result)
 
-def test_win_rock(monkeypatch):
+@pytest.fixture(scope="function", params=[(0,"s"), (1,"r"), (2,"p")])
+def lose_cases(request):
     '''
-    Summary:    Using monkeypatching for game.generate_random function.
-                Confirms the user_input wins against computer when
-                rock is picked.
+    Summary:    Uses pytest fixtures to define the test cases
+    Input:      None
+    Output:     Tuplues with input and expected result for each parameter
+    '''
+    return request.param
+
+def test_lose(monkeypatch, lose_cases):
+    '''
+    Summary:    Using pytest fixtures to test when result is draw.
+                Implemented monkeypatching for game.generate_random function.
+                Confirms the user_input compared with computer
+                output results in "Computer Wins!"
     Input:      None
     Output:     None
     '''
+    (input, result) = lose_cases
     def _mocked():
-        return 0
+        return input
     monkeypatch.setattr("game.generate_random", _mocked)
-    assert "User Wins!" in game.compare('p')
-    
-def test_win_paper(monkeypatch):
+    assert "Computer Wins!" in game.compare(result)
+
+
+@pytest.fixture(scope="function", params=[(0,"p"), (1,"s"), (2,"r")])
+def win_cases(request):
     '''
-    Summary:    Using monkeypatching for game.generate_random function.
-                Confirms the user_input wins against computer when
-                paper is picked.
+    Summary:    Uses pytest fixtures to define the test cases
+    Input:      None
+    Output:     Tuplues with input and expected result for each parameter
+    '''
+    return request.param
+
+def test_win(monkeypatch, win_cases):
+    '''
+    Summary:    Using pytest fixtures to test when result is draw.
+                Implemented monkeypatching for game.generate_random function.
+                Confirms the user_input compared with computer
+                output results in "User Wins!"
     Input:      None
     Output:     None
     '''
+    (input, result) = win_cases
     def _mocked():
-        return 1
+        return input
     monkeypatch.setattr("game.generate_random", _mocked)
-    assert "User Wins!" in game.compare('s')
-    
-def test_win_scissors(monkeypatch):
-    '''
-    Summary:    Using monkeypatching for game.generate_random function.
-                Confirms the user_input wins against computer when
-                scissors is picked.
-    Input:      None
-    Output:     None
-    '''
-    def _mocked():
-        return 2
-    monkeypatch.setattr("game.generate_random", _mocked)
-    assert "User Wins!" in game.compare('r')
+    assert "User Wins!" in game.compare(result)
+
